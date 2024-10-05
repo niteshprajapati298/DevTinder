@@ -1,3 +1,5 @@
+## Episode 3
+
 - Create a repository
 - Initialize the repository 
 - node_modules , package , json , package-lock.json
@@ -8,3 +10,29 @@
 - What are dependencies 
 - What is the use of "-g" while npm install
 - Difference between caret and tilda (^ vs ~)
+
+## Episode 4
+- intialize git
+- .gitignore
+- Create a remote repo on github
+- Push all code to remote origin
+- Play with rmeote and route extensions ex. /hello , /hello/2 . /xyz 
+- Order of the routes  matter a lot
+- Install PostMan app and make a  workspace/collection > test API call 
+- Write logic to handle GET , POST , PATCH , DELETE API Calls and test then on postman
+- routing ??
+- Explore routing and use of ? , + , () , * in the routes 
+- Use of regex in routes /a/ /.*fly$/
+- Reading the query params in the routes
+- Reading the dynamic routes
+
+
+## episode 5:-
+- Multiple Route handlers :- play with the code
+- next()
+- next function and erros along with the res.send()
+- app.use("/route",rH , rH2, rH3, rH4, rH5)
+- write dummy auth middleware for all user routes except /user/login
+- write a dummy auth middle for admin
+- difference between app.use and app.all
+- Error handling using app.use "/" , (err , req , res , next) => {}
