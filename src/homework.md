@@ -33,6 +33,19 @@
 - next function and erros along with the res.send()
 - app.use("/route",rH , rH2, rH3, rH4, rH5)
 - write dummy auth middleware for all user routes except /user/login
+- what is middle wares
+- how express js basically handles requests behind the scenes
 - write a dummy auth middle for admin
 - difference between app.use and app.all
 - Error handling using app.use "/" , (err , req , res , next) => {}
+
+
+## Episode 6:- 
+- Create a free cluster on mongo db official website (mognoDb atlas)
+- Install mongoose library 
+- connect your application to the database "connection-url"/devTinder
+- call the connectDB function and connect to database before starting application on 7777....
+- Create a userSchema & userModel
+- signup API to add data to database
+- push some documents using API calls from postman 
+- Error Handling 
