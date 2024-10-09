@@ -1,18 +1,22 @@
 const express = require("express");
-require("./config/database");
 const connectDB = require("./config/database");
 const app = express(); // when we call this we are creating a web server using express
-const User = require("./models/user")
+const User = require("./models/user");
+
+app.use(express.json());
 
 app.post("/signup",async (req,res)=>{
- const userobject = {
-    firstName:"Nitesh",
-    lastName:"Prajapati",
-    emailId:"niteshkmrprajapati298@gmail.com",
-    password:"nitesh@123"
- }
+    // console.log(req.body);
+     
+//  const userobject = {
+
+//     firstName:"Nitesh",
+//     lastName:"Prajapati",
+//     emailId:"niteshkmrprajapati298@gmail.com",
+//     password:"nitesh@123"
+//  }
  //Creating a new instance of the User model
- const user = new User(userobject)
+ const user = new User(req.body)
  try {
     await user.save();
  res.send("User Added Successfully")

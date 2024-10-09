@@ -49,3 +49,8 @@
 - signup API to add data to database
 - push some documents using API calls from postman 
 - Error Handling 
+
+## Episode 7:-
+- Difference between javascript object and JSON 
+- Add the express.json middleware to your app
+- Make your signup API dynamic to recieve data from the end user
