@@ -86,11 +86,19 @@ app.delete("/user", async (req, res) => {
         res.status(500).send("Something went wrong"); // 500 for server error
     }
 });
-app.patch("/user", async (req, res) => {
-    const _id = req.body._id;
+app.patch("/user/:userId", async (req, res) => {
+    // const _id = req.body._id;
+    const _id = req.params?.userId;
     const data = req.body;
 
     try {
+        const Allowed_Updates = ["photoUrl","age","gender","skills"];
+        const isUpdateAllowed = Object.keys(data).every((k)=>Allowed_Updates.includes(k));
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed");
+            
+        }
+        
         const updatedUser = await User.findByIdAndUpdate(_id, data,{
             runValidators:true,
         });
