@@ -75,5 +75,6 @@
 - add API validation for each field;
 - Install validator 
 - Explore validator library functions and use validator function for password, email,url
+- NEVER Trust req.body 
 
 
