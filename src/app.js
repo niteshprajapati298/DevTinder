@@ -1,28 +1,92 @@
 const express = require("express");
 const connectDB = require("./config/database");
+const validator = require("validator");
 const app = express(); // when we call this we are creating a web server using express
 const User = require("./models/user");
-
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { validateSignUpData } = require("./utils/validation")
 app.use(express.json());
+app.use(cookieParser());
 
-app.post("/signup",async (req,res)=>{
-    // console.log(req.body);
 
-//  const userobject = {
+app.post("/signup", async (req, res) => {
+    try {
+        //validation of data
+        validateSignUpData(req);
 
-//     firstName:"Nitesh",
-//     lastName:"Prajapati",
-//     emailId:"niteshkmrprajapati298@gmail.com",
-//     password:"nitesh@123"
-//  }
- //Creating a new instance of the User model
- const user = new User(req.body)
- try {
-    await user.save();
- res.send("User Added Successfully")
- } catch (err) {
-    res.status(400).send("Error saving the user: "+err.message)
- }
+        //Encrypt the password  ::: 
+        const { firstName, lastName, emailId, password } = req.body;
+
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const user = new User({
+            firstName
+            , lastName
+            , emailId
+            , password: passwordHash
+        }); ~
+
+
+            await user.save();
+        res.send("User Added Successfully")
+    } catch (err) {
+        res.status(400).send("ERROR : " + err.message)
+    }
+});
+app.post("/login", async (req, res) => {
+
+    try {
+        const { emailId, password } = req.body;
+
+        if (!validator.isEmail(emailId)) {
+            throw new Error("Email address is not valid.");
+        }
+
+        const user = await User.findOne({ emailId: emailId })
+        if (!user) {
+            throw new Error("INVALID CREDENTIALS")
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (isPasswordValid) {
+            // Create a JWT token
+            const token = await jwt.sign({ _id: user._id }, "DEVtinder@123")
+            res.cookie("token", token);
+            res.send("Login Successful");
+        }
+        else {
+
+            throw new Error("INVALID CREDENTIALS");
+
+        }
+
+
+
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+app.get("/profile", async (req, res) => {
+    const cookies = req.cookies;
+    const { token } = cookies;
+
+
+    try {
+        if (!token) {
+            throw new Error("No User Found");
+        }
+        const decodedMessage = await jwt.verify(token, "DEVtinder@123");
+        console.log(decodedMessage);
+        // we can get the id from decoded messsage
+         const { _id } = decodedMessage;
+         const user = await User.findOne({_id:_id}) 
+         res.send(user);
+    } catch (error) {
+        console.error("Invalid Token", error);
+        res.status(401).send("Invalid or expired token");
+    }
 });
 
 // app.get("/user",async (req,res)=>{
@@ -92,19 +156,19 @@ app.patch("/user/:userId", async (req, res) => {
     const data = req.body;
 
     try {
-        const Allowed_Updates = ["photoUrl","age","gender","skills"];
-        const isUpdateAllowed = Object.keys(data).every((k)=>Allowed_Updates.includes(k));
-        if(!isUpdateAllowed){
+        const Allowed_Updates = ["photoUrl", "age", "gender", "skills"];
+        const isUpdateAllowed = Object.keys(data).every((k) => Allowed_Updates.includes(k));
+        if (!isUpdateAllowed) {
             throw new Error("Update not allowed");
-            
+
         }
-        
-        const updatedUser = await User.findByIdAndUpdate(_id, data,{
-            runValidators:true,
+
+        const updatedUser = await User.findByIdAndUpdate(_id, data, {
+            runValidators: true,
         });
         res.send("User Updated Successfully");
     } catch (error) {
-        res.status(404).send("Update failed"+error.message);
+        res.status(404).send("Update failed" + error.message);
     }
 });
 

@@ -78,3 +78,23 @@
 - NEVER Trust req.body 
 
 
+
+## Episode 9:- 
+
+- validate data in signup API
+- Install bcrypt package 
+- Create a password hash using bcrypt.hash & save the user is encrypted password
+- create a login API 
+- compare passwords and throw errors if email or password is invalid
+ 
+
+ ## Episode 10:-
+ - install cookie parser       
+ - send a dummy cookie to user
+ - create GET/profile API and check if you get the cookie back
+ - install jsonwebtoken
+ - 
+ - IN login API After email and passsword validation , create a JWT token and send it to user in cookies , create a JWT token
+ - read the cookies inside your profile API and find the logged in user
+
+- sahilkhan028011@gmail.com
