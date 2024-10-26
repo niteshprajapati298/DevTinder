@@ -94,7 +94,21 @@
  - create GET/profile API and check if you get the cookie back
  - install jsonwebtoken
  - 
- - IN login API After email and passsword validation , create a JWT token and send it to user in cookies , create a JWT token
+ - IN login API After email and passsword validation , create a JWT token and send it to user in cookies 
  - read the cookies inside your profile API and find the logged in user
+ - Add the userAuth middle ware in profile API and a new sendConnectionRequest API
+ - Set the expiry of JWT token and cookies to 7 days
+ - Create userSchema method to getJWT()
+ - Create UserSchema method to comparePassword(passwordInputByUser)
 
-- sahilkhan028011@gmail.com
+## Episode 11:-
+- Explore tinder APIs
+- Create a list all API you can think of is DevTinder
+- Group multiple routes under respective routers 
+- Read documentation for express.Router
+- create authRouter , profileRouter , requestRouter
+- Import these router in app.js
+- create POST /logout API
+- Create PATCH /profile/edit
+- Create PATCH /profile/password API = > forgot password API
+- Make your validate all data in every POST , PATCH apis
