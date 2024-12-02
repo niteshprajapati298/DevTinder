@@ -112,3 +112,17 @@
 - Create PATCH /profile/edit
 - Create PATCH /profile/password API = > forgot password API
 - Make your validate all data in every POST , PATCH apis
+
+
+## Episode 12:- queries and indexes 
+- Create Conncection Request Schema 
+- Send conncection Request API
+- Proper validation of Data  
+- Think about all corner cases 
+- $or query read more about it these type of queries
+- schema.pre  function
+- Read more about indexes in MongoDB
+- Why do we need index in DB?
+- What is the advantages and disadvantage of creating index?
+- Read this article aobut compound indexes   
+# Learnin lession :- think about corner cases else attacker can attack our api 
