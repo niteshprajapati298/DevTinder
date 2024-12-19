@@ -27,7 +27,7 @@ const userAuth = async (req,res,next)=>{
         const decodedObj =  await jwt.verify(token, "DEVtinder@123");
 
         if(!token){
-            throw new Error("Token is not valid")
+            return res.status(401).send('Please Login')
         };
         const {_id }= decodedObj;
 
@@ -40,7 +40,7 @@ const userAuth = async (req,res,next)=>{
         next();
         
     } catch (error) {
-        res.status(400).send("ERROR: ",error.message)
+        res.status(400).json({"ERROR":error.message})
     }
 
 }
