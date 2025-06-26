@@ -1,11 +1,13 @@
  
 const express = require("express");
 const connectDB = require("./config/database");
-const app = express();
+
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const dotenv = require('dotenv');
+const path = require("path")
 dotenv.config();
+const app = express();
 
 
 app.use(
@@ -16,6 +18,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
@@ -28,6 +31,9 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
+
+
+console.log("Static path:", path.join(__dirname, "../uploads"));
 
 connectDB()
   .then(() => {
