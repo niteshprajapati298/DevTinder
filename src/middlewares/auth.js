@@ -24,7 +24,7 @@ const userAuth = async (req,res,next)=>{
 
     try {
         const {token} = req.cookies;
-        const decodedObj =  await jwt.verify(token, "DEVtinder@123");
+        const decodedObj =  jwt.verify(token, "DEVtinder@123");
 
         if(!token){
             return res.status(401).send('Please Login')

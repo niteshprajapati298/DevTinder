@@ -1,26 +1,8 @@
 const express = require("express");
+const profileRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
-const {validateEditProfileData,validateEditFieldValues} = require("../utils/validation")
-const profileRouter = express.Router()
-const validator = require("validator");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const upload = require("../middlewares/cloudinaryUpload");
 
-const uploadDir = "uploads";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `user-${Date.now()}${ext}`);
-  }
-});
-
-const upload = multer({ storage });
 
 
 profileRouter.get("/profile/view",userAuth, async (req, res) => {
@@ -33,33 +15,43 @@ profileRouter.get("/profile/view",userAuth, async (req, res) => {
         res.status(401).send("Invalid or expired token" , error.message);
     }
 });
-profileRouter.patch("/profile/edit", userAuth, upload.single("photo"), async (req, res) => {
-  try {
-    if (!validateEditProfileData(req)) {
-      throw new Error("Invalid Edit Request");
+
+profileRouter.patch(
+  "/profile/edit",
+  userAuth,
+  upload.single("photo"),
+  async (req, res) => {
+    try {
+      const user = req.user;
+      console.log("✅ REQ BODY:", JSON.stringify(req.body, null, 2));
+      console.log("✅ REQ FILE:", JSON.stringify(req.file, null, 2));
+      // Update editable fields
+      const updateFields = ["firstName", "lastName", "age", "gender", "about"];
+      updateFields.forEach((field) => {
+        if (req.body[field]) {
+          user[field] = req.body[field];
+        }
+      });
+
+      // Update photo URL if a file was uploaded
+      if (req.file && req.file.path) {
+        user.photoUrl = req.file.path;
+        console.log("Uploaded to Cloudinary:", req.file.path);
+      }
+
+      await user.save();
+
+      res.json({
+        message: `${user.firstName}, your profile was updated successfully.`,
+        data: user,
+      });
+    } catch (err) {
+      console.error("❌ Error while updating profile:", JSON.stringify(err, null, 2));
+      res.status(500).json({
+        error: err.message || "Something went wrong while updating profile.",
+      });
     }
-
-    const loggedInUser = req.user;
-
-    // Assign non-file fields
-    Object.keys(req.body).forEach((key) => {
-      loggedInUser[key] = req.body[key];
-    });
-
-    // If a file was uploaded, update the photoUrl
-    if (req.file) {
-      loggedInUser.photoUrl = `/uploads/${req.file.filename}`;
-    }
-
-    await loggedInUser.save();
-
-    res.json({
-      message: `${loggedInUser.firstName}, your profile updated successfully.`,
-      data: loggedInUser,
-    });
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
   }
-});
+);
 
 module.exports = profileRouter;
