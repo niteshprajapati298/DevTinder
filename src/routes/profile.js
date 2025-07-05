@@ -26,7 +26,7 @@ profileRouter.patch(
       console.log("✅ REQ BODY:", JSON.stringify(req.body, null, 2));
       console.log("✅ REQ FILE:", JSON.stringify(req.file, null, 2));
       // Update editable fields
-      const updateFields = ["firstName", "lastName", "age", "gender", "about"];
+      const updateFields = ["firstName", "lastName", "age", "gender", "about","skills"];
       updateFields.forEach((field) => {
         if (req.body[field]) {
           user[field] = req.body[field];

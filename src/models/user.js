@@ -51,8 +51,9 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        default: "uploads/default.png", // store the local path relative to your public folder
-    },
+        default: "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg",
+      }
+      ,
 
     about: {
         type: String,
