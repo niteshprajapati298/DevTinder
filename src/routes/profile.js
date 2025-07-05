@@ -22,10 +22,13 @@ profileRouter.patch(
   upload.single("photo"),
   async (req, res) => {
     try {
+      console.log("📩 Incoming body:", req.body);
+      console.log("📷 Uploaded file info:", req.file);
+
       const user = req.user;
-      
+
       // Update editable fields
-      const updateFields = ["firstName", "lastName", "age", "gender", "about","skills"];
+      const updateFields = ["firstName", "lastName", "age", "gender", "about", "skills"];
       updateFields.forEach((field) => {
         if (req.body[field]) {
           user[field] = req.body[field];
@@ -44,6 +47,7 @@ profileRouter.patch(
         data: user,
       });
     } catch (err) {
+      console.error("❌ Profile edit error:", err);
       res.status(500).json({
         error: err.message || "Something went wrong while updating profile.",
       });
