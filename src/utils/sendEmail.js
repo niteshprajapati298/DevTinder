@@ -102,10 +102,10 @@ const generateEmailContent = ({ type, fromName, toName, verifyUrl }) => {
 
     case "accepted":
       return {
-        subject: `${toName} accepted your request! 🎉`,
+        subject: `${fromName} accepted your request! 🎉`,
         html: `
-          <h2>Hey ${fromName},</h2>
-          <p><strong>${toName}</strong> accepted your connection request on DevTinder!</p>
+          <h2>Hey ${toName},</h2>
+          <p><strong>${fromName}</strong> accepted your connection request on DevTinder!</p>
           <p>You can now start chatting!</p>
         `,
       };

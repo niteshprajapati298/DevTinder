@@ -5,18 +5,22 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
-const { run } = require("../utils/sendEmail"); // ✅ Correct import
+const { run } = require("../utils/sendEmail");
+
+const isProd = process.env.NODE_ENV === "production";
 
 // SIGNUP
 authRouter.post("/signup", async (req, res) => {
   try {
     validateSignUpData(req);
-    const { firstName, lastName, emailId, password } = req.body;
+
+    const firstName = req.body.firstName?.trim();
+    const lastName = req.body.lastName?.trim();
+    const emailId = req.body.emailId?.toLowerCase().trim();
+    const password = req.body.password;
 
     const existingUser = await User.findOne({ emailId });
-    if (existingUser) {
-      throw new Error("Email already registered.");
-    }
+    if (existingUser) throw new Error("Email already registered.");
 
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -25,12 +29,11 @@ authRouter.post("/signup", async (req, res) => {
       lastName,
       emailId,
       password: passwordHash,
-      isEmailVerified: false, // ✅ Track email verification
+      isEmailVerified: false,
     });
 
     await user.save();
 
-    // ✅ Generate verification token
     const emailToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
@@ -39,7 +42,6 @@ authRouter.post("/signup", async (req, res) => {
 
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${emailToken}`;
 
-    // ✅ Send verification email
     await run({
       toAddress: emailId,
       fromName: "DevTinder",
@@ -48,9 +50,11 @@ authRouter.post("/signup", async (req, res) => {
       verifyUrl: verificationUrl,
     });
 
-    res.status(200).send("Verification email sent. Please check your inbox.");
+    res.status(200).json({
+      message: "Verification email sent. Please check your inbox.",
+    });
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -66,34 +70,41 @@ authRouter.get("/verify-email/:token", async (req, res) => {
     user.isEmailVerified = true;
     await user.save();
 
-    res.redirect(`${process.env.FRONTEND_URL}/login?verified=true`);
+    // Optional: Auto-login after verification
+    // const loginToken = await user.getJWT();
+    // res.cookie("token", loginToken, {
+    //   httpOnly: true,
+    //   secure: isProd,
+    //   sameSite: isProd ? "Strict" : "Lax",
+    //   expires: new Date(Date.now() + 15 * 60 * 1000),
+    // });
+
+    return res.redirect(`${process.env.FRONTEND_URL}/login?verified=true`);
   } catch (err) {
-    res.status(400).send("Invalid or expired token.");
+    if (err.name === "TokenExpiredError") {
+      return res.status(400).send("Your verification link has expired.");
+    }
+    return res.status(400).send("Invalid or expired token.");
   }
 });
 
-//login route
+// LOGIN
 authRouter.post("/login", async (req, res) => {
   try {
-    const { emailId, password } = req.body;
+    const emailId = req.body.emailId?.toLowerCase().trim();
+    const password = req.body.password;
 
     if (!validator.isEmail(emailId)) {
       throw new Error("Email address is not valid.");
     }
 
     const user = await User.findOne({ emailId });
-    if (!user) {
-      throw new Error("INVALID CREDENTIALS");
-    }
+    if (!user) throw new Error("INVALID CREDENTIALS");
 
     const isPasswordValid = await user.validatePassword(password);
-    if (!isPasswordValid) {
-      throw new Error("INVALID CREDENTIALS");
-    }
+    if (!isPasswordValid) throw new Error("INVALID CREDENTIALS");
 
-    // ✅ Check if email is not verified
     if (!user.isEmailVerified) {
-      // Generate a new email verification token
       const emailToken = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET,
@@ -102,7 +113,6 @@ authRouter.post("/login", async (req, res) => {
 
       const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${emailToken}`;
 
-      // ✅ Resend the verification email
       await run({
         toAddress: emailId,
         fromName: "DevTinder",
@@ -111,22 +121,23 @@ authRouter.post("/login", async (req, res) => {
         verifyUrl: verificationUrl,
       });
 
-      return res.status(401).send("Please verify your email. A new verification link has been sent.");
+      return res.status(401).json({
+        error: "Please verify your email. A new verification link has been sent.",
+      });
     }
 
     const token = await user.getJWT();
-    const isProd = process.env.NODE_ENV === "production";
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "Strict" : "Lax",
-      expires: new Date(Date.now() + 15 * 60 * 1000), // 15 mins
+      expires: new Date(Date.now() + 15 * 60 * 1000),
     });
 
-    res.send(user);
+    res.status(200).json(user);
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -134,8 +145,9 @@ authRouter.post("/login", async (req, res) => {
 authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, {
     expires: new Date(Date.now()),
+    httpOnly: true,
   });
-  res.send("Logout Successful");
+  res.json({ message: "Logout successful" });
 });
 
 module.exports = authRouter;
