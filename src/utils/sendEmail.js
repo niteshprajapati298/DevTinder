@@ -63,6 +63,11 @@
 // module.exports = { run };
 const { Resend } = require("resend");
 
+if(!process.env.RESEND_API_KEY){
+  console.error("❌ Resend Environment variable is missing in .env file");
+  process.exit(1); // Stop the app immediately
+}
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // 👇 Handles all email content generation based on `type`
