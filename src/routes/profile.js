@@ -2,7 +2,7 @@ const express = require("express");
 const profileRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
 const upload = require("../middlewares/cloudinaryUpload");
-
+const cloudinary = require("../utils/cloudinary");
 
 
 profileRouter.get("/profile/view",userAuth, async (req, res) => {
@@ -15,6 +15,7 @@ profileRouter.get("/profile/view",userAuth, async (req, res) => {
         res.status(401).send("Invalid or expired token" , error.message);
     }
 });
+
 
 profileRouter.patch(
   "/profile/edit",
@@ -35,9 +36,27 @@ profileRouter.patch(
         }
       });
 
-      // Update photo URL if a file was uploaded
+      // If a new photo is uploaded
       if (req.file && req.file.path) {
-        user.photoUrl = req.file.path;
+        // ✅ Safely delete old Cloudinary image
+        if (user.cloudinaryId) {
+          try {
+            await cloudinary.uploader.destroy(user.cloudinaryId);
+            console.log("🗑️ Old image deleted:", user.cloudinaryId);
+          } catch (deleteErr) {
+            console.warn("⚠️ Failed to delete old image:", deleteErr.message);
+          }
+        }
+
+        // ✅ Upload new image to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "DevTinder",
+        });
+
+        // ✅ Save new photo data
+        user.photoUrl = result.secure_url;
+        user.cloudinaryId = result.public_id;
+        console.log("✅ New image uploaded:", result.public_id);
       }
 
       await user.save();
@@ -54,5 +73,6 @@ profileRouter.patch(
     }
   }
 );
+
 
 module.exports = profileRouter;

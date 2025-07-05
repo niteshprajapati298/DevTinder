@@ -52,8 +52,11 @@ const userSchema = new mongoose.Schema({
     photoUrl: {
         type: String,
         default: "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg",
-      }
-      ,
+      },
+      cloudinaryId: {
+        type: String,
+        default: "",
+      },
 
     about: {
         type: String,
