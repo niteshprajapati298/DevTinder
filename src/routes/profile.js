@@ -23,8 +23,7 @@ profileRouter.patch(
   async (req, res) => {
     try {
       const user = req.user;
-      console.log("✅ REQ BODY:", JSON.stringify(req.body, null, 2));
-      console.log("✅ REQ FILE:", JSON.stringify(req.file, null, 2));
+      
       // Update editable fields
       const updateFields = ["firstName", "lastName", "age", "gender", "about","skills"];
       updateFields.forEach((field) => {
@@ -36,7 +35,6 @@ profileRouter.patch(
       // Update photo URL if a file was uploaded
       if (req.file && req.file.path) {
         user.photoUrl = req.file.path;
-        console.log("Uploaded to Cloudinary:", req.file.path);
       }
 
       await user.save();
@@ -46,7 +44,6 @@ profileRouter.patch(
         data: user,
       });
     } catch (err) {
-      console.error("❌ Error while updating profile:", JSON.stringify(err, null, 2));
       res.status(500).json({
         error: err.message || "Something went wrong while updating profile.",
       });

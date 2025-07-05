@@ -125,10 +125,10 @@ const run = async ({ toAddress, fromName = "DevTinder", toName, type, verifyUrl 
       html,
     });
 
-    console.log("✅ Email sent via Resend:", response);
+    // console.log("✅ Email sent via Resend:", response);
     return response;
   } catch (err) {
-    console.error("❌ Failed to send email via Resend:", err.message);
+    // console.error("❌ Failed to send email via Resend:", err.message);
     throw new Error("Failed to send email.");
   }
 };
