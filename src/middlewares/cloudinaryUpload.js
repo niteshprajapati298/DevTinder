@@ -7,7 +7,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "DevTinder",
-    allowed_formats: ["jpg", "jpeg", "png"],
+    allowed_formats: ["jpg", "jpeg", "png","webp"],
     public_id: (req, file) => `user-${Date.now()}`,
     resource_type: "image", // ✅ important for image uploads
   },
