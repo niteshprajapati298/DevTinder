@@ -18,7 +18,7 @@ const server = http.createServer(app);
 // Attach Socket.io to the HTTP server
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://tinderdev.xyz"],
     credentials: true,
   },
 });
