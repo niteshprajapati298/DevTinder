@@ -17,13 +17,13 @@ const server = http.createServer(app);
 
 // Attach Socket.io to the HTTP server with custom path
 const io = socketIo(server, {
-  path: "/api/socket.io/",
   cors: {
     origin: ["http://localhost:5173", "https://tinderdev.xyz"],
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
+
 
 // Middleware
 app.use(
