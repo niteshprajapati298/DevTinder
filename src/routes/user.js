@@ -4,9 +4,8 @@ const { userAuth } = require("../middlewares/auth");
 const ConnectionRequests = require("../models/connectionRequest");
 const User = require("../models/user");
 
-const USER_SAFE_DATA = "firstName lastName photoUrl age gender about";
+const USER_SAFE_DATA = "firstName lastName emailId photoUrl age gender about";
 
-// ✅ Route: Received connection requests
 userRouter.get("/user/connection/received", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
@@ -25,7 +24,7 @@ userRouter.get("/user/connection/received", userAuth, async (req, res) => {
   }
 });
 
-// ✅ Route: Accepted connections (shows OTHER user)
+
 userRouter.get("/user/connections", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
@@ -40,24 +39,26 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
       .populate("toUserId", USER_SAFE_DATA)
       .populate("fromUserId", USER_SAFE_DATA);
 
-    // 🧠 Return the other user in each connection
-    const data = connections.map((conn) => {
-      const from = conn.fromUserId;
-      const to = conn.toUserId;
-
-      return from._id.toString() === loggedInUser._id.toString() ? to : from;
-    });
+    // Filter out any connections where either side failed to populate
+    const connectionUsers = connections
+      .filter(conn => conn.fromUserId && conn.toUserId)
+      .map(conn => {
+        const from = conn.fromUserId;
+        const to = conn.toUserId;
+        // Pick the "other" user
+        return from._id.toString() === loggedInUser._id.toString() ? to : from;
+      });
 
     res.json({
       message: "My Connections",
-      connection: data,
+      connections: connectionUsers,
     });
+
   } catch (error) {
+    console.error("Error in /user/connections:", error);
     res.status(500).json({ message: `Server Error: ${error.message}` });
   }
 });
-
-// ✅ Route: Feed - people you may know
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
