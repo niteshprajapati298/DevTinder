@@ -9,14 +9,14 @@ const socketIo = require("socket.io");
 const connectDB = require("./config/database");
 const setupSocket = require("./config/socket");
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
-// Attach Socket.io with custom path
+// Attach Socket.io to the HTTP server
 const io = socketIo(server, {
-  path: "/api/socket.io/",
   cors: {
     origin: ["http://localhost:5173", "https://tinderdev.xyz"],
     methods: ["GET", "POST"],
@@ -27,13 +27,15 @@ const io = socketIo(server, {
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://tinderdev.xyz"],
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
+// If you're serving images or files
+// app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Routes
 const authRouter = require("./routes/auth");
