@@ -27,7 +27,7 @@ const io = socketIo(server, {
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://tinderdev.xyz"],
     credentials: true,
   })
 );
