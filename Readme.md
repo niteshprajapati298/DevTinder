@@ -190,16 +190,7 @@ npm run test:coverage
    - Verify token expiration settings
    - Clear browser cookies and retry
 
-## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 📞 Support
-
-For support and questions:
-- Create an issue on GitHub
-- Contact the development team
-- Check the API documentation for integration help
 
 ## 🔄 Version History
 
