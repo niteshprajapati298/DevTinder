@@ -18,7 +18,7 @@ const server = http.createServer(app);
 // Attach Socket.io to the HTTP server with custom path
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://tinderdev.xyz","https://dev-tinder-web-pi.vercel.app","devtinder-production-a027.up.railway.app"],
+    origin: ["http://localhost:5173", "https://tinderdev.xyz","https://dev-tinder-web-pi.vercel.app"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -28,7 +28,7 @@ const io = socketIo(server, {
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://tinderdev.xyz"],
+    origin: ["http://localhost:5173", "https://tinderdev.xyz","https://dev-tinder-web-pi.vercel.app"],
     credentials: true,
   })
 );
