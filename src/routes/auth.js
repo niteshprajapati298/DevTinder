@@ -7,8 +7,6 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const { run } = require("../utils/sendEmail");
 
-const isProd = process.env.NODE_ENV === "production";
-
 // SIGNUP
 authRouter.post("/signup", async (req, res) => {
   try {
@@ -70,15 +68,6 @@ authRouter.get("/verify-email/:token", async (req, res) => {
     user.isEmailVerified = true;
     await user.save();
 
-    // Optional: Auto-login after verification
-    // const loginToken = await user.getJWT();
-    // res.cookie("token", loginToken, {
-    //   httpOnly: true,
-    //   secure: isProd,
-    //   sameSite: isProd ? "Strict" : "Lax",
-    //   expires: new Date(Date.now() + 15 * 60 * 1000),
-    // });
-
     return res.redirect(`${process.env.FRONTEND_URL}/login?verified=true`);
   } catch (err) {
     if (err.name === "TokenExpiredError") {
@@ -128,11 +117,12 @@ authRouter.post("/login", async (req, res) => {
 
     const token = await user.getJWT();
 
+    // ✅ Always production-safe cookie settings
     res.cookie("token", token, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "Strict" : "Lax",
-      expires: new Date(Date.now() + 15 * 60 * 1000),
+      secure: true,        // Always HTTPS only
+      sameSite: "None",    // Allow cross-site
+      expires: new Date(Date.now() + 15 * 60 * 1000), // 15 mins
     });
 
     res.status(200).json(user);
@@ -146,6 +136,8 @@ authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, {
     expires: new Date(Date.now()),
     httpOnly: true,
+    secure: true,
+    sameSite: "None",
   });
   res.json({ message: "Logout successful" });
 });
